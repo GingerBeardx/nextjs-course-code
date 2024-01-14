@@ -14,6 +14,8 @@ function HomePage(props) {
 }
 
 // executes before the component function runs and populates the data
+// this function executes when the application is built, not necessarily
+// on the server when the page is requested
 export async function getStaticProps() {
   const filePath = path.join(process.cwd(), 'data', 'dummy-backend.json');
   const jsonData = await fs.readFile(filePath);
@@ -23,6 +25,7 @@ export async function getStaticProps() {
     props: {
       products: data.products,
     },
+    revalidate: 10, // only generate refreshed data every 10 seconds, if less than 10 seconds, then the cached data will be used. During development, the page will be regenerated on every request
   }; // will be passed to the page component as props
 }
 
