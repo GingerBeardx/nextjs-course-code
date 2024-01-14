@@ -1,5 +1,6 @@
 import path from 'path';
 import fs from 'fs/promises';
+import Link from 'next/link';
 
 function HomePage(props) {
   const { products } = props;
@@ -7,7 +8,9 @@ function HomePage(props) {
   return (
     <ul>
       {products?.map((product) => (
-        <li key={product.id}>{product.title}</li>
+        <li key={product.id}>
+          <Link href={`${product.id}`}>{product.title}</Link>
+        </li>
       ))}
     </ul>
   );
@@ -16,10 +19,22 @@ function HomePage(props) {
 // executes before the component function runs and populates the data
 // this function executes when the application is built, not necessarily
 // on the server when the page is requested
-export async function getStaticProps() {
+export async function getStaticProps(context) {
   const filePath = path.join(process.cwd(), 'data', 'dummy-backend.json');
   const jsonData = await fs.readFile(filePath);
   const data = JSON.parse(jsonData);
+
+  if (!data) {
+    return {
+      redirect: {
+        destination: '/no-data',
+      },
+    };
+  }
+
+  if (data.products.length === 0) {
+    return { notFound: true };
+  }
 
   return {
     props: {
