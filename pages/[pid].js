@@ -24,20 +24,28 @@ export default function ProductDetailPage(props) {
   );
 }
 
+async function getData() {
+  const filePath = path.join(process.cwd(), 'data', 'dummy-backend.json');
+  const jsonData = await fs.readFile(filePath);
+  return JSON.parse(jsonData);
+}
+
 export async function getStaticPaths() {
+  const data = await getData();
+  const ids = data.products.map((product) => product.id);
+  const pathsWithParams = ids.map((id) => ({ params: { pid: id } }));
+
   return {
-    paths: [{ params: { pid: 'p1' } }],
-    fallback: 'blocking', // false: 404 if the page is not found, true: generate the page on the server if it's not found
+    paths: pathsWithParams,
+    fallback: false, // false: 404 if the page is not found, true: generate the page on the server if it's not found
   };
 }
 
 export async function getStaticProps(context) {
   const { params } = context;
   const productId = params.pid;
+  const data = await getData();
 
-  const filePath = path.join(process.cwd(), 'data', 'dummy-backend.json');
-  const jsonData = await fs.readFile(filePath);
-  const data = JSON.parse(jsonData);
   const product = data.products.find((product) => product.id === productId);
 
   if (!product) {
