@@ -32,12 +32,13 @@ async function getData() {
 
 export async function getStaticPaths() {
   const data = await getData();
+
   const ids = data.products.map((product) => product.id);
   const pathsWithParams = ids.map((id) => ({ params: { pid: id } }));
 
   return {
     paths: pathsWithParams,
-    fallback: false, // false: 404 if the page is not found, true: generate the page on the server if it's not found
+    fallback: true, // false: 404 if the page is not found, true: generate the page on the server if it's not found
   };
 }
 
