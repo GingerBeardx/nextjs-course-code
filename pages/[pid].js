@@ -1,9 +1,15 @@
-//dynamic pages would not be pre-rendered during build time, but will be generated on the server for every incoming request unless explictly declared in the getStaticPaths function.
+//dynamic pages would not be pre-rendered during build time, but will
+//be generated on the server for every incoming request unless
+//explictly declared in the getStaticPaths function.
 
 import path from 'path';
 import fs from 'fs/promises';
 
 export default function ProductDetailPage(props) {
+  if (!props.product) {
+    return <p>Loading...</p>;
+  }
+
   const { title, description } = props.product;
 
   if (!title) {
@@ -20,12 +26,8 @@ export default function ProductDetailPage(props) {
 
 export async function getStaticPaths() {
   return {
-    paths: [
-      { params: { pid: 'p1' } },
-      { params: { pid: 'p2' } },
-      { params: { pid: 'p3' } },
-    ],
-    fallback: false, // false: 404 if the page is not found, true: generate the page on the server if it's not found
+    paths: [{ params: { pid: 'p1' } }],
+    fallback: 'blocking', // false: 404 if the page is not found, true: generate the page on the server if it's not found
   };
 }
 
